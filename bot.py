@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-import src.irclib as irclib
+import lib.irclib as irclib
 import sys, os, thread
 from settings import *
 import modules
@@ -68,9 +67,9 @@ def initmodule(last, type, pers):
 
 def loads(mod, type):
     global unmods
-    update = open('src/unloaded.txt', 'w')
+    update = open('lib/unloaded.txt', 'w')
     if mod == None and type == None:
-        unloads = open('src/unloaded.txt', 'r').readline()
+        unloads = open('lib/unloaded.txt', 'r').readline()
         if ":" in unloads:
             unmods = unloads.split(':')
         elif len(unloads) > 3:

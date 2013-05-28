@@ -15,7 +15,6 @@ def init(server, chan, la):
         if "." in la:
             try:
                 stat = requests.get(la, timeout=10)
-                print stat.status_code
                 if stat.status_code == 200 and stat.text is not None:
                     server.privmsg(chan, la + " is up and serving content, try another by doing !isup site")
                 elif stat.status_code == 200 and stat.text is None:
@@ -27,10 +26,6 @@ def init(server, chan, la):
                 pass
             except requests.exceptions.Timeout:
                 server.privmsg(chan, "Request timed out.")
-                pass
-            except Exception, e:
-                server.privmsg("Syed", str(e))
-                server.privmsg(chan, "Some sort of error.")
                 pass
         else:
             server.privmsg(chan, "Enter a valid website in the following format: website.tld")

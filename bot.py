@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import src.irclib as irclib
-import sys, os, thread
+import sys
+import os
+import thread
 from settings import *
 import modules
 
@@ -10,6 +12,7 @@ server = irc.server()
 server.connect(network, port, nick, ircname=name)
 
 unmods = list()
+
 
 def getmodules():
     global hooks, pmhooks, args, pmargs, mods
@@ -71,13 +74,13 @@ def initmodule(last, type, pers):
 def loads(mod, type):
     global unmods
     update = open('src/unloaded.txt', 'w')
-    if mod is None and type is None:
+    if not mod and not type:
         unloads = open('src/unloaded.txt', 'r').readline()
         if ":" in unloads:
             unmods = unloads.split(':')
         elif len(unloads) > 3:
             unmods.append(unloads)
-    elif not mod is None and type == "unload":
+    elif mod and type == "unload":
         try:
             if mod in sys.modules: del sys.modules[mod]
             if mod in hooks: del hooks[mod]
@@ -91,7 +94,7 @@ def loads(mod, type):
         except Exception, e:
             server.privmsg(chan, "The module: " + mod + " failed because: " + str(e))
             pass
-    elif not mod is None and type == "load":
+    elif mod and type == "load":
         if mod in unmods:
             unmods.remove(mod)
             update.write(":".join(unmods))
@@ -99,7 +102,7 @@ def loads(mod, type):
             getmodules()
         elif mod in mods:
             server.privmsg(chan, "The module: %s is already loaded." % mod)
-    elif not mod is None and type == "loadall":
+    elif mod and type == "loadall":
         del unmods[:]
     update.write(":".join(unmods))
 
@@ -143,9 +146,9 @@ def modsettings(lm, ls, lh):
 
 def handleEndMotd(connection, event):
         print "You have properly connected to " + network
-        if not nickpass is None:
+        if nickpass:
             server.privmsg("Nickserv", "id " + nickpass)
-        if not operpass is None:
+        if operpass:
             server.send_raw("OPER " + nick + " " + operpass)
         server.send_raw("UMODE2 " + modes)
         server.join(chan)

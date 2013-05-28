@@ -11,8 +11,6 @@ def init(server, chan, la):
             la = la[8:]
         if "http://" not in la:
             la = "http://" + la 
-        dots = len(la.split('.'))
-        ndots = dots - 1
         if "." in la:
             try:
                 stat = requests.get(la, timeout=10)

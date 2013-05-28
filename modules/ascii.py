@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+
 inithooks = ["server", "chan", "lastpubmsg"]
 args = ["!asc"]
 

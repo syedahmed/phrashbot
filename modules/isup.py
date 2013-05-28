@@ -1,8 +1,9 @@
 import requests
-from settings import admin
+
 
 inithooks = ["server", "chan", "lastpubmsg"]
 args = ["!isup"]
+
 
 def init(server, chan, la):
     if '!isup' in la[:5]:
@@ -10,24 +11,25 @@ def init(server, chan, la):
         if "https://" in la:
             la = la[8:]
         if "http://" not in la:
-            la = "http://" + la 
+            la = "http://" + la
         if "." in la:
             try:
                 stat = requests.get(la, timeout=10)
+                print stat.status_code
                 if stat.status_code == 200 and stat.text is not None:
-                    server.privmsg(chan, la +" is up and serving content, try another by doing !isup site")
+                    server.privmsg(chan, la + " is up and serving content, try another by doing !isup site")
                 elif stat.status_code == 200 and stat.text is None:
-                    server.privmsg(chan, la +" is up, but not serving content, try another by doing !isup site")
-                else: 
-                    server.privmsg(chan, la +" is down, try another by doing !isup site")
+                    server.privmsg(chan, la + " is up, but not serving content, try another by doing !isup site")
+                else:
+                    server.privmsg(chan, la + " is down, try another by doing !isup site")
             except requests.exceptions.ConnectionError:
-                server.privmsg(chan, "Can't connect to domain.")
+                server.privmsg(chan, "DNS issues.")
                 pass
             except requests.exceptions.Timeout:
                 server.privmsg(chan, "Request timed out.")
                 pass
-            except Exception,e: 
-                server.privmsg(admin, str(e))
+            except Exception, e:
+                server.privmsg("Syed", str(e))
                 server.privmsg(chan, "Some sort of error.")
                 pass
         else:

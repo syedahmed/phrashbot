@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-import lib.irclib as irclib
+
+import src.irclib as irclib
 import sys, os, thread
 from settings import *
 import modules
 
 irc = irclib.IRC()
 server = irc.server()
-server.connect(network, port, nick, ircname = name)
+server.connect(network, port, nick, ircname=name)
 
 unmods = list()
 
@@ -17,7 +18,7 @@ def getmodules():
     reload(modules)
     loads(None, None)
     for mod in dir(modules):
-        if "__" not in mod and "os" not in mod and "modules."+ mod not in unmods:
+        if "__" not in mod and "os" not in mod and "modules." + mod not in unmods:
             mod = "modules." + mod
             mods.append(mod)
             modu = sys.modules[mod]
@@ -29,9 +30,10 @@ def getmodules():
             except:
                 pass
 
+
 def initmodule(last, type, pers):
     inithooks, initpmhooks = list(), list()
-    for mod in mods: 
+    for mod in mods:
         counter = 0
         for x in args[mod]:
             inithooks = []
@@ -47,9 +49,9 @@ def initmodule(last, type, pers):
                         inithooks = tuple(inithooks)
                         thread.start_new_thread(sys.modules[mod].init, (inithooks))
                     except Exception as e:
-                        server.privmsg(chan, mod + " failed because of the following error: %s: %s" % (e.__class__.__name__,str(e)))
-                        server.privmsg(admin, mod + " failed because of the following error: %s: %s" % (e.__class__.__name__,str(e)))
-        if mod in pmargs and type == "pm" and pmer != None:
+                        server.privmsg(chan, mod + " failed because of the following error: %s: %s" % (e.__class__.__name__, str(e)))
+                        server.privmsg(admin, mod + " failed because of the following error: %s: %s" % (e.__class__.__name__, str(e)))
+        if mod in pmargs and type == "pm" and not pmer is None:
             for x in pmargs[mod]:
                 initpmhooks = []
                 if x in last:
@@ -62,19 +64,20 @@ def initmodule(last, type, pers):
                         inithooks = tuple(initpmhooks)
                         thread.start_new_thread(sys.modules[mod].init, (initpmhooks))
                     except Exception as e:
-                        server.privmsg(pmer, mod + " failed because of the following error: %s: %s" % (e.__class__.__name__,str(e)))
-                        server.privmsg(admin, mod + " failed because of the following error: %s: %s" % (e.__class__.__name__,str(e)))
+                        server.privmsg(pmer, mod + " failed because of the following error: %s: %s" % (e.__class__.__name__, str(e)))
+                        server.privmsg(admin, mod + " failed because of the following error: %s: %s" % (e.__class__.__name__, str(e)))
+
 
 def loads(mod, type):
     global unmods
-    update = open('lib/unloaded.txt', 'w')
-    if mod == None and type == None:
-        unloads = open('lib/unloaded.txt', 'r').readline()
+    update = open('src/unloaded.txt', 'w')
+    if mod is None and type is None:
+        unloads = open('src/unloaded.txt', 'r').readline()
         if ":" in unloads:
             unmods = unloads.split(':')
         elif len(unloads) > 3:
             unmods.append(unloads)
-    elif mod != None and type == "unload":
+    elif not mod is None and type == "unload":
         try:
             if mod in sys.modules: del sys.modules[mod]
             if mod in hooks: del hooks[mod]
@@ -86,9 +89,9 @@ def loads(mod, type):
                 unmods.append(mod)
                 server.privmsg(chan, "Unloaded %s" % mod)
         except Exception, e:
-            server.privmsg(chan, "The module: "+ mod + " failed because: " + str(e))
+            server.privmsg(chan, "The module: " + mod + " failed because: " + str(e))
             pass
-    elif mod != None and type == "load":
+    elif not mod is None and type == "load":
         if mod in unmods:
             unmods.remove(mod)
             update.write(":".join(unmods))
@@ -96,10 +99,11 @@ def loads(mod, type):
             getmodules()
         elif mod in mods:
             server.privmsg(chan, "The module: %s is already loaded." % mod)
-    elif mod == None and type == "loadall":
+    elif not mod is None and type == "loadall":
         del unmods[:]
     update.write(":".join(unmods))
-    
+
+
 def modsettings(lm, ls, lh):
     if ' ' in lm:
         mod = lm.split(' ')[1]
@@ -120,7 +124,7 @@ def modsettings(lm, ls, lh):
                     reload(sys.modules[mod])
                     server.privmsg(chan, "Module %s reloaded." % mod)
                 except Exception, e:
-                    server.privmsg(chan, "The module: "+ mod + " failed because: " + str(e))
+                    server.privmsg(chan, "The module: " + mod + " failed because: " + str(e))
                     pass
         if "!reload" in lm[:7] and " " not in lm:
             try:
@@ -136,37 +140,41 @@ def modsettings(lm, ls, lh):
         if "!load " in lm[:6]:
             loads(mod, "load")
 
+
 def handleEndMotd(connection, event):
-        print "You have properly connected to "+ network
-        if nickpass != None:
-            server.privmsg("Nickserv", "id "+ nickpass)
-        if operpass != None:
-            server.send_raw ("OPER " + nick +" " + operpass)
-        server.send_raw("UMODE2 "+ modes)
+        print "You have properly connected to " + network
+        if not nickpass is None:
+            server.privmsg("Nickserv", "id " + nickpass)
+        if not operpass is None:
+            server.send_raw("OPER " + nick + " " + operpass)
+        server.send_raw("UMODE2 " + modes)
         server.join(chan)
-        getmodules()         
-        
+        getmodules()
+
+
 def handlePubMessage(connection, event):
         global lastpubmsg, lasthost, lastspeaker, chan
         target = event.target()
-        del chan # Remove the channel from settings(MULTI-CHAN SUPPORT)
+        del chan  # Remove the channel from settings(MULTI-CHAN SUPPORT)
         chan = target
         speaker = event.source().split('!')[0]
         lasthost = event.source().split('!')[1]
         lastpubmsg = event.arguments()[0].decode('utf8')
-        print target ,">", speaker ,":", lastpubmsg.encode('utf-8').strip()
+        print target, ">", speaker, ":", lastpubmsg.encode('utf-8').strip()
         lastspeaker = speaker
         if speaker != lastspeaker:
             print (speaker + " says ")
         initmodule(lastpubmsg, "pubmsg", None)
-        modsettings(lastpubmsg, lastspeaker, lasthost) 
-                           
+        modsettings(lastpubmsg, lastspeaker, lasthost)
+
+
 def handleprivmsg(connection, event):
     global pm, pmer
     pm = event.arguments()[0]
     pmer = event.source().split('!')[0]
-    print pmer ,":", pm
+    print pmer, ":", pm
     initmodule(pm, "pm", pmer)
+
 
 def handledc(connection, event):
     python = sys.executable

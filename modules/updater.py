@@ -1,8 +1,10 @@
 import subprocess, os
 from settings import admin, adminhost
 
+
 inithooks = ["server", "chan", "lastpubmsg", "lastspeaker", "lasthost"]
 args = ["!gitupdate"]
+
 
 def init(server, chan, lastpubmsg, ls, lh):
     if os.name != "nt" and "!gitupdate" in lastpubmsg[:10] and ls == admin and lh == adminhost:

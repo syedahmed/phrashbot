@@ -757,6 +757,7 @@ class ServerConnection(Connection):
     def privmsg(self, target, text):
         """Send a PRIVMSG command."""
         # Should limit len(text) here!
+        text.rstrip()
         self.send_raw("PRIVMSG %s :%s" % (target, text))
 
     def privmsg_many(self, targets, text):
